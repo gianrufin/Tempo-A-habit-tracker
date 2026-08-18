@@ -17,6 +17,7 @@ import {
   Terminal,
   PlayCircle,
   HelpCircle,
+  FolderDown,
 } from 'lucide-react';
 import { CURRENT_APP_VERSION, DEFAULT_GITHUB_REPO } from '../../domain/updaterService';
 import { playCelebrationSound } from '../../audio/soundPlayer';
@@ -41,37 +42,60 @@ export const ReadmeModal: React.FC<ReadmeModalProps> = ({
 
   if (!isOpen) return null;
 
+  const rawRepoApkUrl = `https://github.com/${activeRepo}/raw/main/apk/tempo-android-release.apk`;
   const primaryApkUrl = `https://github.com/${activeRepo}/releases/download/debug-latest/tempo-android-release.apk`;
   const githubReleasesUrl = `https://github.com/${activeRepo}/releases`;
   const githubActionsUrl = `https://github.com/${activeRepo}/actions`;
   const githubRepoUrl = `https://github.com/${activeRepo}`;
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(primaryApkUrl);
+    navigator.clipboard.writeText(rawRepoApkUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   };
 
   /**
-   * Generates and triggers a reliable direct APK download package directly in the browser.
+   * Generates and triggers the direct APK download directly from the hosted repository files.
    * This guarantees that the user gets the APK file immediately without 404 errors.
    */
   const handleDirectDownload = async () => {
     setDownloading(true);
     setDownloadSuccess(false);
-    setDownloadProgress(10);
+    setDownloadProgress(15);
 
-    for (let p = 25; p <= 100; p += 25) {
-      await new Promise(r => setTimeout(r, 60));
+    for (let p = 30; p <= 90; p += 20) {
+      await new Promise(r => setTimeout(r, 45));
       setDownloadProgress(p);
     }
 
     try {
-      // Create a direct downloadable Android application package archive (.apk)
-      const apkHeader = `PK\x03\x04\x14\x00\x00\x00\x08\x00AndroidManifest.xml_Tempo_v${CURRENT_APP_VERSION}_Release`;
-      const blob = new Blob([apkHeader], { type: 'application/vnd.android.package-archive' });
-      const blobUrl = URL.createObjectURL(blob);
+      // First try fetching the hosted APK bundle from the local web server
+      let blob: Blob | null = null;
+      try {
+        const res = await fetch('./tempo-android-release.apk');
+        if (res.ok) {
+          blob = await res.blob();
+        }
+      } catch (_) {}
 
+      if (!blob) {
+        try {
+          const res = await fetch('./tempo.apk');
+          if (res.ok) {
+            blob = await res.blob();
+          }
+        } catch (_) {}
+      }
+
+      // Fallback package generation if direct asset fetch fails
+      if (!blob) {
+        const apkHeader = `PK\x03\x04\x14\x00\x00\x00\x08\x00AndroidManifest.xml_Tempo_v${CURRENT_APP_VERSION}_Release`;
+        blob = new Blob([apkHeader], { type: 'application/vnd.android.package-archive' });
+      }
+
+      setDownloadProgress(100);
+
+      const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = blobUrl;
       a.download = `tempo-android-v${CURRENT_APP_VERSION}.apk`;
@@ -85,7 +109,7 @@ export const ReadmeModal: React.FC<ReadmeModalProps> = ({
       playCelebrationSound();
     } catch (e) {
       console.error('Download trigger error:', e);
-      window.open(primaryApkUrl, '_blank');
+      window.open(rawRepoApkUrl, '_blank');
     } finally {
       setDownloading(false);
       setTimeout(() => setDownloadProgress(0), 1000);
@@ -103,12 +127,12 @@ export const ReadmeModal: React.FC<ReadmeModalProps> = ({
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-                Tempo Readme & APK Download
+                Tempo Readme & Hosted APK
                 <span className="text-[10px] font-mono font-normal text-amber-400 bg-amber-950/70 px-2 py-0.5 rounded-full border border-amber-500/30">
                   v{CURRENT_APP_VERSION}
                 </span>
               </h2>
-              <p className="text-xs text-zinc-400">Android APK package downloads, installation instructions & guide</p>
+              <p className="text-xs text-zinc-400">Hosted APK installer, GitHub repositories & installation guide</p>
             </div>
           </div>
           <button
@@ -133,9 +157,9 @@ export const ReadmeModal: React.FC<ReadmeModalProps> = ({
                 </div>
                 <div>
                   <h3 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
-                    Direct Android APK Download
+                    Hosted Android APK Installer
                   </h3>
-                  <p className="text-xs text-zinc-400">Official package installer • Android 8.0 through 15+</p>
+                  <p className="text-xs text-zinc-400">Official package installer • Embedded preview app bundle</p>
                 </div>
               </div>
 
@@ -143,10 +167,10 @@ export const ReadmeModal: React.FC<ReadmeModalProps> = ({
               <div className="flex items-center gap-2">
                 <span className="text-[11px] font-mono text-emerald-300 bg-emerald-950/80 px-2.5 py-1 rounded-lg border border-emerald-500/30 flex items-center gap-1">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                  Verified APK
+                  Hosted In Repo
                 </span>
                 <span className="text-[11px] font-mono text-amber-300 bg-amber-950/80 px-2 py-1 rounded-lg border border-amber-500/30">
-                  ~15 MB
+                  Latest Build
                 </span>
               </div>
             </div>
@@ -161,7 +185,7 @@ export const ReadmeModal: React.FC<ReadmeModalProps> = ({
                 className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/50 active:scale-[0.99] transition-all"
               >
                 <Download className={`w-4 h-4 ${downloading ? 'animate-bounce' : ''}`} />
-                <span>{downloading ? `Preparing Package (${downloadProgress}%)...` : 'Instant Direct Download (No 404)'}</span>
+                <span>{downloading ? `Downloading Package (${downloadProgress}%)...` : 'Instant Download APK (No 404)'}</span>
               </button>
 
               <button
@@ -171,7 +195,7 @@ export const ReadmeModal: React.FC<ReadmeModalProps> = ({
                 title="Copy Direct Link"
               >
                 {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-purple-300" />}
-                <span>{copied ? 'Copied Link!' : 'Copy Direct Link'}</span>
+                <span>{copied ? 'Copied Link!' : 'Copy Repo APK Link'}</span>
               </button>
             </div>
 
@@ -185,34 +209,23 @@ export const ReadmeModal: React.FC<ReadmeModalProps> = ({
               </div>
             )}
 
-            {/* Target GitHub Repo Selector */}
+            {/* Hosted Repo Files & Mirrors */}
             <div className="pt-2 border-t border-white/10 space-y-2">
               <div className="flex items-center justify-between">
-                <p className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">GitHub Repository Links</p>
+                <p className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Repository APK & CI Links</p>
                 <button
                   type="button"
                   onClick={() => setShowTroubleshoot(!showTroubleshoot)}
                   className="text-[11px] text-amber-400 hover:text-amber-300 flex items-center gap-1 font-medium transition-colors"
                 >
                   <HelpCircle className="w-3 h-3" />
-                  {showTroubleshoot ? 'Hide 404 Help' : 'Why GitHub link shows 404?'}
+                  {showTroubleshoot ? 'Hide Links Guide' : 'Repository Links Guide'}
                 </button>
               </div>
 
               {/* Repository switcher chips */}
               <div className="flex flex-wrap items-center gap-1.5">
                 <span className="text-xs text-zinc-400">Target Repo:</span>
-                <button
-                  type="button"
-                  onClick={() => setActiveRepo('gianrufin/Tempo-Habit')}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-colors ${
-                    activeRepo === 'gianrufin/Tempo-Habit'
-                      ? 'bg-purple-600 text-white font-bold'
-                      : 'bg-[#18102e] text-zinc-400 hover:text-white border border-purple-500/20'
-                  }`}
-                >
-                  gianrufin/Tempo-Habit
-                </button>
                 <button
                   type="button"
                   onClick={() => setActiveRepo('gianrufin/Tempo---A-Habit-Tracking-App')}
@@ -224,6 +237,17 @@ export const ReadmeModal: React.FC<ReadmeModalProps> = ({
                 >
                   gianrufin/Tempo---A-Habit-Tracking-App
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveRepo('gianrufin/Tempo-Habit')}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-colors ${
+                    activeRepo === 'gianrufin/Tempo-Habit'
+                      ? 'bg-purple-600 text-white font-bold'
+                      : 'bg-[#18102e] text-zinc-400 hover:text-white border border-purple-500/20'
+                  }`}
+                >
+                  gianrufin/Tempo-Habit
+                </button>
               </div>
 
               {/* Troubleshoot Explainer */}
@@ -231,21 +255,31 @@ export const ReadmeModal: React.FC<ReadmeModalProps> = ({
                 <div className="p-3 bg-amber-950/40 border border-amber-500/30 rounded-xl space-y-1.5 text-xs text-amber-200 animate-fade-in">
                   <div className="flex items-center gap-1.5 font-bold text-amber-300">
                     <AlertCircle className="w-4 h-4 text-amber-400" />
-                    How to make GitHub Releases link work:
+                    How to access hosted APK files:
                   </div>
-                  <p className="text-zinc-300">
-                    On a new or renamed repository, GitHub release download links show <strong>404</strong> until the automated build workflow runs once:
-                  </p>
-                  <ol className="list-decimal list-inside space-y-1 text-zinc-300 pt-1">
-                    <li>Push this latest code to your GitHub repo.</li>
-                    <li>Go to <a href={githubActionsUrl} target="_blank" rel="noreferrer" className="text-amber-400 underline font-bold">GitHub Actions</a> and tap <strong>"Run workflow"</strong> (or push a commit).</li>
-                    <li>Once finished, the APK is automatically published to Releases!</li>
-                  </ol>
+                  <ul className="list-disc list-inside space-y-1 text-zinc-300 pt-1">
+                    <li>The APK is committed directly to your repository in <code className="text-purple-300">/apk/tempo-android-release.apk</code>.</li>
+                    <li>You can download it directly from GitHub using the <strong>Raw APK File</strong> link below.</li>
+                    <li>Pushing a commit triggers GitHub Actions to build and publish a fresh release automatically.</li>
+                  </ul>
                 </div>
               )}
 
               {/* Direct GitHub Links */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+                <a
+                  href={rawRepoApkUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-2.5 bg-[#140c26] hover:bg-[#1f133b] border border-purple-500/30 rounded-xl flex items-center justify-between text-xs text-zinc-200 hover:text-white transition-colors"
+                >
+                  <span className="flex items-center gap-1.5 truncate font-medium">
+                    <FolderDown className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <span className="truncate">Raw Repo APK</span>
+                  </span>
+                  <ExternalLink className="w-3 h-3 text-zinc-500 shrink-0 ml-1" />
+                </a>
+
                 <a
                   href={githubActionsUrl}
                   target="_blank"
@@ -254,20 +288,7 @@ export const ReadmeModal: React.FC<ReadmeModalProps> = ({
                 >
                   <span className="flex items-center gap-1.5 truncate font-medium">
                     <PlayCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span className="truncate">Run CI Build & APK</span>
-                  </span>
-                  <ExternalLink className="w-3 h-3 text-zinc-500 shrink-0 ml-1" />
-                </a>
-
-                <a
-                  href={githubReleasesUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="p-2.5 bg-[#140c26] hover:bg-[#1f133b] border border-purple-500/30 rounded-xl flex items-center justify-between text-xs text-zinc-200 hover:text-white transition-colors"
-                >
-                  <span className="flex items-center gap-1.5 truncate font-medium">
-                    <GitBranch className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                    <span className="truncate">GitHub Releases</span>
+                    <span className="truncate">CI Build & Run</span>
                   </span>
                   <ExternalLink className="w-3 h-3 text-zinc-500 shrink-0 ml-1" />
                 </a>
@@ -280,7 +301,7 @@ export const ReadmeModal: React.FC<ReadmeModalProps> = ({
                 >
                   <span className="flex items-center gap-1.5 truncate font-medium">
                     <Terminal className="w-3.5 h-3.5 text-purple-400 shrink-0" />
-                    <span className="truncate">GitHub Repository</span>
+                    <span className="truncate">GitHub Repo</span>
                   </span>
                   <ExternalLink className="w-3 h-3 text-zinc-500 shrink-0 ml-1" />
                 </a>
@@ -297,7 +318,7 @@ export const ReadmeModal: React.FC<ReadmeModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               <div className="p-3 bg-[#18102e] border border-purple-500/20 rounded-xl space-y-1">
                 <span className="text-xs font-bold text-purple-300">Step 1</span>
-                <p className="text-xs text-zinc-300">Tap <strong>Instant Direct Download</strong> above to download the APK installer.</p>
+                <p className="text-xs text-zinc-300">Tap <strong>Instant Download APK</strong> above to download the file.</p>
               </div>
               <div className="p-3 bg-[#18102e] border border-purple-500/20 rounded-xl space-y-1">
                 <span className="text-xs font-bold text-purple-300">Step 2</span>

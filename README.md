@@ -10,24 +10,30 @@
 
 ---
 
-## 📲 How to Download & Install the Android APK
+## 📲 Download & Install the Android APK
 
-### 1. ⚡ Instant In-App Download (Direct from Browser)
-In the running web or mobile application, open the top header and click **"APK & README"** &rarr; tap **"Instant Direct Download"**. The `.apk` will download directly to your device without relying on external CDN links.
+### 1. 📦 Direct Hosted Repository Download (Never 404)
+The APK binary is committed directly in this repository:
+
+| Repository | Direct Raw Download Link |
+|---|---|
+| **Tempo---A-Habit-Tracking-App** | [📥 Download tempo-android-release.apk](https://github.com/gianrufin/Tempo---A-Habit-Tracking-App/raw/main/apk/tempo-android-release.apk) |
+| **Tempo-Habit (Alias)** | [📥 Download tempo-android-release.apk](https://github.com/gianrufin/Tempo-Habit/raw/main/apk/tempo-android-release.apk) |
 
 ---
 
-### 2. 📦 Download from GitHub Actions / Releases
+### 2. ⚡ Instant In-App Download
+In the live web application, click the **"APK & README"** button in the top bar and tap **"Instant Download APK (No 404)"** to download the package directly to your phone.
 
-| Resource | Link | Note |
+---
+
+### 3. ⚙️ GitHub Actions CI Releases
+
+| Resource | Link | Description |
 |---|---|---|
-| **⚙️ GitHub Actions (Build & Run APK)** | [GitHub Actions Workflow Runs](https://github.com/gianrufin/Tempo-Habit/actions) | Click `Run workflow` or push a commit to build the APK |
-| **📦 GitHub Releases Hub** | [View Releases & Tags](https://github.com/gianrufin/Tempo-Habit/releases) | Contains released packages once CI finishes |
-| **📥 Direct Release APK Link** | [Download tempo-android-release.apk](https://github.com/gianrufin/Tempo-Habit/releases/download/debug-latest/tempo-android-release.apk) | Available once GitHub Actions completes |
-| **🔗 Repository Link** | [GitHub Repository](https://github.com/gianrufin/Tempo-Habit) | Source code and workflow files |
-
-> ℹ️ **Why would a direct GitHub release link show 404?**  
-> GitHub direct download URLs (`github.com/.../releases/download/...`) only become active **after** the GitHub Actions build workflow has run at least once in your repo. Once the workflow in `.github/workflows/build-debug-apk.yml` finishes, the APK asset is automatically published to the `debug-latest` release tag.
+| **GitHub Actions Workflow** | [⚙️ Actions Build Runs](https://github.com/gianrufin/Tempo---A-Habit-Tracking-App/actions) | View automated build status & triggers |
+| **GitHub Releases Hub** | [📦 Releases & Tags](https://github.com/gianrufin/Tempo---A-Habit-Tracking-App/releases) | Official GitHub release assets |
+| **GitHub Repository** | [📂 Codebase Root](https://github.com/gianrufin/Tempo---A-Habit-Tracking-App) | Repository files and commits |
 
 ---
 
@@ -59,11 +65,10 @@ In the running web or mobile application, open the top header and click **"APK &
 
 ## 📥 Android Installation Instructions
 
-1. Download the `.apk` file (via the in-app **APK & README** button or from [GitHub Actions/Releases](https://github.com/gianrufin/Tempo-Habit/actions)).
-2. On your Android device, open your browser's Downloads or File Manager.
-3. Tap `tempo-android-v1.0.0.apk` (or `tempo-android-release.apk`).
-4. If prompted, toggle **Allow from this source** (Enable installation of unknown apps).
-5. Tap **Install** and open **Tempo**!
+1. Download `tempo-android-release.apk` using the links above.
+2. Open the downloaded file in your Android device's Downloads folder.
+3. If prompted, toggle **Allow from this source** (Enable installation of unknown apps).
+4. Tap **Install** and open **Tempo**!
 
 ---
 
@@ -71,29 +76,18 @@ In the running web or mobile application, open the top header and click **"APK &
 
 ### Android (Gradle)
 ```bash
-# Clone the repository
-git clone https://github.com/gianrufin/Tempo-Habit.git
-cd Tempo-Habit
+# Clone repository
+git clone https://github.com/gianrufin/Tempo---A-Habit-Tracking-App.git
+cd Tempo---A-Habit-Tracking-App
 
-# Build Debug APK
-./gradlew assembleDebug
-
-# Build Release APK
-./gradlew assembleRelease
-```
-The generated APK will be available in `app/build/outputs/apk/debug/app-debug.apk`.
-
-### Web App (Vite + React)
-```bash
-# Install dependencies
+# Build Web Bundle & Sync Assets
 npm install
-
-# Run development server
-npm run dev
-
-# Build production bundle
 npm run build
+
+# Build Android Debug APK
+./gradlew assembleDebug
 ```
+The output APK is generated at `app/build/outputs/apk/debug/app-debug.apk`.
 
 ---
 
