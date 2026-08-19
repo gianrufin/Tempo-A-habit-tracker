@@ -13,11 +13,10 @@ import {
   GitBranch,
   FileText,
   AlertCircle,
-  HardDriveDownload,
+  FolderDown,
   Terminal,
   PlayCircle,
   HelpCircle,
-  FolderDown,
 } from 'lucide-react';
 import { CURRENT_APP_VERSION, DEFAULT_GITHUB_REPO } from '../../domain/updaterService';
 import { playCelebrationSound } from '../../audio/soundPlayer';
@@ -37,11 +36,11 @@ export const ReadmeModal: React.FC<ReadmeModalProps> = ({
   const [downloading, setDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
-  const [activeRepo, setActiveRepo] = useState(DEFAULT_GITHUB_REPO);
   const [showTroubleshoot, setShowTroubleshoot] = useState(false);
 
   if (!isOpen) return null;
 
+  const activeRepo = DEFAULT_GITHUB_REPO; // 'gianrufin/Tempo-Habit'
   const rawRepoApkUrl = `https://github.com/${activeRepo}/raw/main/apk/tempo-android-release.apk`;
   const primaryApkUrl = `https://github.com/${activeRepo}/releases/download/debug-latest/tempo-android-release.apk`;
   const githubReleasesUrl = `https://github.com/${activeRepo}/releases`;
@@ -132,7 +131,7 @@ export const ReadmeModal: React.FC<ReadmeModalProps> = ({
                   v{CURRENT_APP_VERSION}
                 </span>
               </h2>
-              <p className="text-xs text-zinc-400">Hosted APK installer, GitHub repositories & installation guide</p>
+              <p className="text-xs text-zinc-400">Official APK installer for <code className="text-purple-300 font-mono">gianrufin/Tempo-Habit</code></p>
             </div>
           </div>
           <button
@@ -169,7 +168,7 @@ export const ReadmeModal: React.FC<ReadmeModalProps> = ({
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                   Hosted In Repo
                 </span>
-                <span className="text-[11px] font-mono text-amber-300 bg-amber-950/80 px-2 py-1 rounded-lg border border-amber-500/30">
+                <span className="text-[11px] font-mono text-amber-300 bg-amber-950/80 px-2.5 py-1 rounded-lg border border-amber-500/30">
                   Latest Build
                 </span>
               </div>
@@ -212,41 +211,16 @@ export const ReadmeModal: React.FC<ReadmeModalProps> = ({
             {/* Hosted Repo Files & Mirrors */}
             <div className="pt-2 border-t border-white/10 space-y-2">
               <div className="flex items-center justify-between">
-                <p className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Repository APK & CI Links</p>
+                <p className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
+                  Repository (<code className="text-purple-300">gianrufin/Tempo-Habit</code>)
+                </p>
                 <button
                   type="button"
                   onClick={() => setShowTroubleshoot(!showTroubleshoot)}
                   className="text-[11px] text-amber-400 hover:text-amber-300 flex items-center gap-1 font-medium transition-colors"
                 >
                   <HelpCircle className="w-3 h-3" />
-                  {showTroubleshoot ? 'Hide Links Guide' : 'Repository Links Guide'}
-                </button>
-              </div>
-
-              {/* Repository switcher chips */}
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-xs text-zinc-400">Target Repo:</span>
-                <button
-                  type="button"
-                  onClick={() => setActiveRepo('gianrufin/Tempo---A-Habit-Tracking-App')}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-colors ${
-                    activeRepo === 'gianrufin/Tempo---A-Habit-Tracking-App'
-                      ? 'bg-purple-600 text-white font-bold'
-                      : 'bg-[#18102e] text-zinc-400 hover:text-white border border-purple-500/20'
-                  }`}
-                >
-                  gianrufin/Tempo---A-Habit-Tracking-App
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveRepo('gianrufin/Tempo-Habit')}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-colors ${
-                    activeRepo === 'gianrufin/Tempo-Habit'
-                      ? 'bg-purple-600 text-white font-bold'
-                      : 'bg-[#18102e] text-zinc-400 hover:text-white border border-purple-500/20'
-                  }`}
-                >
-                  gianrufin/Tempo-Habit
+                  {showTroubleshoot ? 'Hide Guide' : 'Download & CI Guide'}
                 </button>
               </div>
 
@@ -258,9 +232,9 @@ export const ReadmeModal: React.FC<ReadmeModalProps> = ({
                     How to access hosted APK files:
                   </div>
                   <ul className="list-disc list-inside space-y-1 text-zinc-300 pt-1">
-                    <li>The APK is committed directly to your repository in <code className="text-purple-300">/apk/tempo-android-release.apk</code>.</li>
-                    <li>You can download it directly from GitHub using the <strong>Raw APK File</strong> link below.</li>
-                    <li>Pushing a commit triggers GitHub Actions to build and publish a fresh release automatically.</li>
+                    <li>The APK is committed directly to your repository in <code className="text-purple-300">apk/tempo-android-release.apk</code>.</li>
+                    <li>You can download it directly from GitHub using the <strong>Raw Repo APK</strong> button below.</li>
+                    <li>The automated workflow in <code className="text-purple-300">.github/workflows/build-debug-apk.yml</code> builds the native Android app.</li>
                   </ul>
                 </div>
               )}
@@ -377,11 +351,12 @@ export const ReadmeModal: React.FC<ReadmeModalProps> = ({
               Build From Source (Gradle)
             </h3>
             <pre className="p-3 bg-[#0d0718] border border-purple-500/20 rounded-xl text-[11px] font-mono text-zinc-300 overflow-x-auto">
-              <code>{`# Android APK build
-./gradlew assembleDebug
+              <code>{`# Clone repository
+git clone https://github.com/gianrufin/Tempo-Habit.git
+cd Tempo-Habit
 
-# Output APK path:
-# app/build/outputs/apk/debug/app-debug.apk`}</code>
+# Android APK build
+./gradlew assembleDebug`}</code>
             </pre>
           </div>
         </div>

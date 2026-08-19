@@ -17,13 +17,12 @@ The APK binary is committed directly in this repository:
 
 | Repository | Direct Raw Download Link |
 |---|---|
-| **Tempo---A-Habit-Tracking-App** | [📥 Download tempo-android-release.apk](https://github.com/gianrufin/Tempo---A-Habit-Tracking-App/raw/main/apk/tempo-android-release.apk) |
-| **Tempo-Habit (Alias)** | [📥 Download tempo-android-release.apk](https://github.com/gianrufin/Tempo-Habit/raw/main/apk/tempo-android-release.apk) |
+| **Tempo-Habit** | [📥 Download tempo-android-release.apk](https://github.com/gianrufin/Tempo-Habit/raw/main/apk/tempo-android-release.apk) |
 
 ---
 
 ### 2. ⚡ Instant In-App Download
-In the live web application, click the **"APK & README"** button in the top bar and tap **"Instant Download APK (No 404)"** to download the package directly to your phone.
+In the live web application, click the **"APK & README"** button in the top bar and tap **"Instant Download APK (No 404)"** to download the package directly to your device.
 
 ---
 
@@ -31,9 +30,9 @@ In the live web application, click the **"APK & README"** button in the top bar 
 
 | Resource | Link | Description |
 |---|---|---|
-| **GitHub Actions Workflow** | [⚙️ Actions Build Runs](https://github.com/gianrufin/Tempo---A-Habit-Tracking-App/actions) | View automated build status & triggers |
-| **GitHub Releases Hub** | [📦 Releases & Tags](https://github.com/gianrufin/Tempo---A-Habit-Tracking-App/releases) | Official GitHub release assets |
-| **GitHub Repository** | [📂 Codebase Root](https://github.com/gianrufin/Tempo---A-Habit-Tracking-App) | Repository files and commits |
+| **GitHub Actions Workflow** | [⚙️ Actions Build Runs](https://github.com/gianrufin/Tempo-Habit/actions) | View automated build status & triggers |
+| **GitHub Releases Hub** | [📦 Releases & Tags](https://github.com/gianrufin/Tempo-Habit/releases) | Official GitHub release assets |
+| **GitHub Repository** | [📂 Codebase Root](https://github.com/gianrufin/Tempo-Habit) | Repository files and commits |
 
 ---
 
@@ -65,7 +64,7 @@ In the live web application, click the **"APK & README"** button in the top bar 
 
 ## 📥 Android Installation Instructions
 
-1. Download `tempo-android-release.apk` using the links above.
+1. Download `tempo-android-release.apk` using the link above.
 2. Open the downloaded file in your Android device's Downloads folder.
 3. If prompted, toggle **Allow from this source** (Enable installation of unknown apps).
 4. Tap **Install** and open **Tempo**!
@@ -77,8 +76,8 @@ In the live web application, click the **"APK & README"** button in the top bar 
 ### Android (Gradle)
 ```bash
 # Clone repository
-git clone https://github.com/gianrufin/Tempo---A-Habit-Tracking-App.git
-cd Tempo---A-Habit-Tracking-App
+git clone https://github.com/gianrufin/Tempo-Habit.git
+cd Tempo-Habit
 
 # Build Web Bundle & Sync Assets
 npm install

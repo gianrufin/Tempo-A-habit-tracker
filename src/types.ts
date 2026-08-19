@@ -117,7 +117,7 @@ export interface UserPreferences {
   autoStartBreaks: boolean;
   theme: 'amoled' | 'dark' | 'light';
   appVersion?: string; // e.g. '1.0.0'
-  githubRepo?: string; // e.g. 'gianrufin/tempo-android'
+  githubRepo?: string; // e.g. 'gianrufin/Tempo-Habit'
   autoCheckUpdates?: boolean;
   lastUpdateCheckedAt?: string;
 }

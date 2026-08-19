@@ -18,13 +18,7 @@ android {
         versionCode = 1
         versionName = "0.1.0"
 
-        val gitSha = try {
-            providers.exec {
-                commandLine("git", "rev-parse", "--short=12", "HEAD")
-            }.standardOutput.asText.get().trim()
-        } catch (_: Exception) {
-            "0.1.0"
-        }
+        val gitSha = System.getenv("GITHUB_SHA")?.take(12) ?: "1.0.0"
         buildConfigField("String", "GIT_SHA", "\"$gitSha\"")
     }
 

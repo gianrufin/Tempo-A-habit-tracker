@@ -248,7 +248,7 @@ const DEFAULT_PREFERENCES: UserPreferences = {
   autoStartBreaks: true,
   theme: 'amoled',
   appVersion: '1.0.0',
-  githubRepo: 'gianrufin/tempo-android',
+  githubRepo: 'gianrufin/Tempo-Habit',
   autoCheckUpdates: true,
 };
 
