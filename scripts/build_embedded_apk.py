@@ -6,21 +6,28 @@ def create_apk():
     os.makedirs("public/downloads", exist_ok=True)
     os.makedirs("apk", exist_ok=True)
     
-    # Ensure dist exists
-    if not os.path.exists("dist"):
-        print("dist directory not found, running build")
-        os.system("npm run build")
+    # Clean any nested APKs in public or dist
+    for d in ["public", "dist", "public/downloads", "dist/downloads"]:
+        if os.path.exists(d):
+            for f in os.listdir(d):
+                if f.endswith(".apk"):
+                    try:
+                        os.remove(os.path.join(d, f))
+                    except Exception:
+                        pass
     
     # Collect all web files to include in APK assets
     web_files = []
     dist_dir = "dist"
-    for root, dirs, files in os.walk(dist_dir):
-        for file in files:
-            full_path = os.path.join(root, file)
-            rel_path = os.path.relpath(full_path, dist_dir)
-            web_files.append((full_path, f"assets/web/{rel_path}"))
+    if os.path.exists(dist_dir):
+        for root, dirs, files in os.walk(dist_dir):
+            for file in files:
+                if file.endswith('.apk'):
+                    continue
+                full_path = os.path.join(root, file)
+                rel_path = os.path.relpath(full_path, dist_dir)
+                web_files.append((full_path, f"assets/web/{rel_path}"))
             
-    # Minimal binary Android Manifest stub & signature metadata
     manifest_bytes = b"""<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.tempo.app"
@@ -54,7 +61,7 @@ Version: 1.0.0
     ]
     
     # Create the APK ZIP archive
-    primary_apk = "public/tempo-android-release.apk"
+    primary_apk = "apk/tempo-android-release.apk"
     with zipfile.ZipFile(primary_apk, 'w', zipfile.ZIP_DEFLATED) as apk:
         apk.writestr("AndroidManifest.xml", manifest_bytes)
         apk.writestr("META-INF/MANIFEST.MF", manifest_mf)
@@ -70,7 +77,7 @@ Version: 1.0.0
         if dest != primary_apk:
             shutil.copyfile(primary_apk, dest)
             
-    print(f"Successfully generated {len(apk_destinations)} hosted APK binaries!")
+    print(f"Successfully generated {len(apk_destinations)} clean hosted APK binaries!")
     for dest in apk_destinations:
         size_kb = os.path.getsize(dest) / 1024
         print(f" - {dest} ({size_kb:.1f} KB)")

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Settings, Flame, Zap, FileText, Download } from 'lucide-react';
+import { Search, Settings, Flame, Zap, Download } from 'lucide-react';
 import { UserPreferences } from '../types';
 
 interface TopBarProps {
@@ -66,17 +66,28 @@ export const TopBar: React.FC<TopBarProps> = ({
           </span>
         </div>
 
-        {/* Readme & Direct APK Download */}
+        {/* Direct APK Download Anchor */}
+        <a
+          id="topbar-download-apk-link"
+          href="./tempo-android-release.apk"
+          download="tempo-android-release.apk"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white border border-emerald-400/40 text-xs font-bold shadow-md shadow-emerald-950/40 active:scale-95 transition-all"
+          title="Direct Download Tempo Android APK"
+        >
+          <Download className="w-3.5 h-3.5 text-white" />
+          <span>Get APK</span>
+        </a>
+
+        {/* Readme & Guide */}
         {onOpenReadme && (
           <button
             id="topbar-readme-btn"
             onClick={onOpenReadme}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-purple-900/80 to-amber-900/60 hover:from-purple-800 hover:to-amber-800 text-amber-300 hover:text-amber-200 border border-amber-500/30 text-xs font-semibold shadow-sm transition-all"
-            title="Read README & Download APK"
-            aria-label="README & Download APK"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#18112b] hover:bg-[#251b42] text-amber-300 hover:text-amber-200 border border-purple-500/20 text-xs font-medium shadow-sm transition-all"
+            title="Read README & Installation Guide"
+            aria-label="README & Guide"
           >
-            <Download className="w-3.5 h-3.5 text-amber-400" />
-            <span className="hidden sm:inline">APK & README</span>
+            <span>Guide</span>
           </button>
         )}
 
